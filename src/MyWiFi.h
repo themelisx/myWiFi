@@ -6,9 +6,9 @@
 #include <esp_now.h>
 
 extern MyDebug *myDebug;
-#ifdef USE_MODULE_SWITCHES
-extern MySwitches *mySwitches;
-#endif
+// #ifdef USE_MODULE_SWITCHES
+// extern MySwitches *mySwitches;
+// #endif
 
 typedef struct s_espNow {
   uint8_t type;
