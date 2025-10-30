@@ -6,8 +6,6 @@
 #include "MyDebug.h"
 #include "MyWiFi.h"
 
-MyWiFi* g_myWiFiInstance = nullptr;
-
 MyWiFi::MyWiFi() {
     myDebug->println(DEBUG_LEVEL_DEBUG, "[WiFi]");  
     
@@ -154,9 +152,12 @@ void MyWiFi::addEspNowPeer(uint8_t address[6]) {
 
 bool MyWiFi::initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, OnDataRecvCallback onRecv) {
 
-    g_myWiFiInstance = this;
-
     myDebug->println(DEBUG_LEVEL_INFO, "Initializing ESP-NOW...");
+
+    if (onRecv == nullptr) {
+        myDebug->println(DEBUG_LEVEL_ERROR, "register_recv_cb is null");        
+        return false;
+    }
     
     WiFi.mode(WIFI_STA);
     
@@ -174,6 +175,7 @@ bool MyWiFi::initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, 
     // preper register peer
     peerInfo.channel = channel;  
     peerInfo.encrypt = encrypted;
+    peerInfo.ifidx = WIFI_IF_STA;
 
     // Once ESPNow is successfully Init, we will register for Send CB to
     // get the status of Trasnmitted packet
@@ -183,6 +185,8 @@ bool MyWiFi::initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, 
 
     // Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onRecv);
+    
+    return true;
 }
 
 esp_err_t MyWiFi::sendEspNow(const uint8_t *peer_addr, uint8_t type, uint8_t id, uint16_t value) {
