@@ -7,9 +7,6 @@
 #include <esp_now.h>
 
 extern MyDebug *myDebug;
-// #ifdef USE_MODULE_SWITCHES
-// extern MySwitches *mySwitches;
-// #endif
 
 typedef struct s_espNow {
   uint8_t type;
@@ -22,6 +19,9 @@ private:
     // functions
     void notInitialized();    
 
+    using OnDataSentCallback = void (*)(const uint8_t *mac_addr, esp_now_send_status_t status);
+    using OnDataRecvCallback = void (*)(const uint8_t *mac_addr, const uint8_t *incomingData, int len);
+
     //Vars
     uint8_t WiFiChannel;
     bool initDone;
@@ -31,7 +31,6 @@ private:
 
     SemaphoreHandle_t semaphoreData;
     
-    char macStr[18];
     char *tmp_buf;
     char *savedSSID;
     char *savedPassword;
@@ -40,9 +39,7 @@ public:
     // functions
     void init(wifi_mode_t mode, char *ssid, char *password);
     void stop();
-    bool initESPNow(int channel, bool encrypted);
-    void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
-    void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len);
+    bool initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, OnDataRecvCallback onRecv);
     void addEspNowPeer(uint8_t address[6]);    
     esp_err_t sendEspNow(const uint8_t *peer_addr, uint8_t type, uint8_t id, uint16_t value);
     void connect();

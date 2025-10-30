@@ -143,61 +143,16 @@ uint8_t MyWiFi::getChannel() {
 // ESPNow //
 ////////////
 void MyWiFi::addEspNowPeer(uint8_t address[6]) {
+    myDebug->println(DEBUG_LEVEL_DEBUG, "Adding ESPNow peer");
     memcpy(peerInfo.peer_addr, address, 6);
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
         myDebug->println(DEBUG_LEVEL_ERROR, "Failed to add peer");
     } else {
-        myDebug->println(DEBUG_LEVEL_INFO, "ESPNow peer added");
+        myDebug->println(DEBUG_LEVEL_DEBUG, "ESPNow peer added");
     }
 }
 
-void OnDataRecvWrapper(const uint8_t *mac_addr, const uint8_t *data, int len) {
-    if (g_myWiFiInstance) {
-        g_myWiFiInstance->OnDataRecv(mac_addr, data, len);
-    }
-}
-
-#ifndef MODE_RELEASE
-void OnDataSentWrapper(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    if (g_myWiFiInstance) {
-        g_myWiFiInstance->OnDataSent(mac_addr, status);
-    }
-}
-
-// Callback when data is sent
-void MyWiFi::OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {  
-    myDebug->print(DEBUG_LEVEL_DEBUG2, "Packet to: ");
-    // Copies the sender mac address to a string
-    snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-    myDebug->print(DEBUG_LEVEL_DEBUG2, macStr);
-    myDebug->print(DEBUG_LEVEL_DEBUG2, " send status:\t");
-    myDebug->println(DEBUG_LEVEL_DEBUG2, status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
-#endif
-
-// Callback when data is received
-void MyWiFi::OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {
-
-  #ifndef MODE_RELEASE
-    myDebug->print(DEBUG_LEVEL_DEBUG2, "Packet from: ");
-    // Copies the sender mac address to a string
-    snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-    myDebug->println(DEBUG_LEVEL_DEBUG2, macStr);
-    myDebug->print(DEBUG_LEVEL_DEBUG2, "Bytes received: ");
-    myDebug->println(DEBUG_LEVEL_DEBUG2, len);
-  #endif
-
-  memcpy(&espNowPacket, incomingData, sizeof(espNowPacket));
-  if (espNowPacket.type == 2) { // Buttons
-    // #ifdef USE_MODULE_SWITCHES
-    //     mySwitches->espNow(espNowPacket.id, espNowPacket.value);
-    // #endif
-  }
-}
-
-bool MyWiFi::initESPNow(int channel, bool encrypted) {
+bool MyWiFi::initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, OnDataRecvCallback onRecv) {
 
     g_myWiFiInstance = this;
 
@@ -212,20 +167,22 @@ bool MyWiFi::initESPNow(int channel, bool encrypted) {
     if (esp_now_init() != ESP_OK) {
         myDebug->println(DEBUG_LEVEL_ERROR, "Error initializing ESP-NOW");
         return false;
+    } else {
+        myDebug->println(DEBUG_LEVEL_DEBUG, "Initializing ESP-NOW ok");
     }
-
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted packet
-    #ifndef MODE_RELEASE
-        esp_now_register_send_cb(OnDataSentWrapper);
-    #endif
 
     // preper register peer
     peerInfo.channel = channel;  
     peerInfo.encrypt = encrypted;
 
+    // Once ESPNow is successfully Init, we will register for Send CB to
+    // get the status of Trasnmitted packet
+    if (onSent != nullptr) {
+        esp_now_register_send_cb(onSent);
+    }
+
     // Register for a callback function that will be called when data is received
-    esp_now_register_recv_cb(OnDataRecvWrapper);
+    esp_now_register_recv_cb(onRecv);
 }
 
 esp_err_t MyWiFi::sendEspNow(const uint8_t *peer_addr, uint8_t type, uint8_t id, uint16_t value) {
