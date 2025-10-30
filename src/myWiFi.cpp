@@ -6,6 +6,8 @@
 #include "myWiFi.h"
 
 MyWiFi::MyWiFi() {
+    myDebug = new MyDebug();
+    myDebug->start(115200, DEBUG_LEVEL_DEBUG);
     myDebug->println(DEBUG_LEVEL_DEBUG, "[WiFi]");  
     
     initDone = false;
