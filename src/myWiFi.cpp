@@ -1,14 +1,10 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "esp_wifi.h"
+#include <esp_now.h>
 
 #include "MyDebug.h"
 #include "MyWiFi.h"
-
-#include <Arduino.h>
-#include <WiFi.h>
-#include "esp_wifi.h"
-#include <esp_now.h>
 
 MyWiFi* g_myWiFiInstance = nullptr;
 
