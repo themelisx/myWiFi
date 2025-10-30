@@ -3,13 +3,14 @@
 
 #include <Arduino.h>
 
+extern MyDebug *myDebug;
+
 class MyWiFi {
 private:
     // functions
     void notInitialized();
 
     //Vars
-    MyDebug *myDebug;
     uint8_t WiFiChannel;
     bool initDone;
 
