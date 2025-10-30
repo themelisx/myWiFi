@@ -195,7 +195,9 @@ void MyWiFi::OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, in
 
   memcpy(&espNowPacket, incomingData, sizeof(espNowPacket));
   if (espNowPacket.type == 2) { // Buttons
-    mySwitches->espNow(espNowPacket.id, espNowPacket.value);
+    #ifdef USE_MODULE_SWITCHES
+        mySwitches->espNow(espNowPacket.id, espNowPacket.value);
+    #endif
   }
 }
 
