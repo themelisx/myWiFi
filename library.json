@@ -1,0 +1,21 @@
+{
+  "name": "MyWiFi",
+  "version": "1.0.0",
+  "description": "Custom Arduino library for WiFi",
+  "keywords": "arduino, esp32, log, wifi, espnow",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/themelisx/MyWiFi.git"
+  },
+  "authors": [
+    {
+      "name": "Themelisx",
+      "email": "themelisx@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "headers": ["myWiFi.h"]
+}
