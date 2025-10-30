@@ -17,5 +17,5 @@
   "license": "MIT",
   "frameworks": "arduino",
   "platforms": "*",
-  "headers": ["myWiFi.h"]
+  "headers": ["MyWiFi.h"]
 }

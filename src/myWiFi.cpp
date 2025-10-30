@@ -2,8 +2,8 @@
 #include <WiFi.h>
 #include "esp_wifi.h"
 
-#include "myDebug.h"
-#include "myWiFi.h"
+#include "MyDebug.h"
+#include "MyWiFi.h"
 
 MyWiFi::MyWiFi() {
     myDebug = new MyDebug();
