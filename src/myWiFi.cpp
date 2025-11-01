@@ -25,12 +25,10 @@ void MyWiFi::init(wifi_mode_t mode, char *ssid, char *password) {
     savedPassword = (char*)malloc(strlen(password) + 1);
     strcpy(savedPassword, password);
 
-    sprintf(tmp_buf, "SSID: '%s', password:'%s'", savedSSID, savedPassword);
-    myDebug->println(DEBUG_LEVEL_DEBUG2, tmp_buf);
+    myDebug->println(DEBUG_LEVEL_DEBUG2, "SSID: '%s', password:'%s'", savedSSID, savedPassword);
 
     WiFi.mode(mode);
-    myDebug->print(DEBUG_LEVEL_INFO, "MAC Address: ");
-    myDebug->println(DEBUG_LEVEL_INFO, WiFi.macAddress());
+    myDebug->println(DEBUG_LEVEL_INFO, "MAC Address: %s", WiFi.macAddress());
     initDone = true;
 }
 
@@ -46,7 +44,7 @@ void MyWiFi::stop() {
 }
 
 void MyWiFi::notInitialized() {
-    myDebug->print(DEBUG_LEVEL_ERROR, "WiFi not initialized");
+    myDebug->println(DEBUG_LEVEL_ERROR, "WiFi not initialized");
 }
 
 void MyWiFi::connect() {    
@@ -71,8 +69,7 @@ void MyWiFi::connect() {
     if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
         myDebug->println(DEBUG_LEVEL_DEBUG, "WiFi connected");
         WiFiChannel = ap_info.primary;      
-        myDebug->print(DEBUG_LEVEL_DEBUG, "WiFi channel: ");
-        myDebug->println(DEBUG_LEVEL_DEBUG, WiFiChannel); 
+        myDebug->println(DEBUG_LEVEL_DEBUG, "WiFi channel: %d", WiFiChannel);
     } else {
         WiFiChannel = 0;
         myDebug->println(DEBUG_LEVEL_DEBUG, "Not connected to any WiFi network.");    
@@ -103,7 +100,7 @@ bool MyWiFi::isConnected() {
 }
 
 void MyWiFi::disconnect() {
-    myDebug->print(DEBUG_LEVEL_DEBUG, "WiFi disconnecting...");
+    myDebug->println(DEBUG_LEVEL_DEBUG, "WiFi disconnecting...");
     if (!initDone) {
         notInitialized();
         return;        
@@ -161,8 +158,7 @@ bool MyWiFi::initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, 
     
     WiFi.mode(WIFI_STA);
     
-    myDebug->print(DEBUG_LEVEL_INFO, "MAC Address: ");
-    myDebug->println(DEBUG_LEVEL_INFO, WiFi.macAddress());
+    myDebug->println(DEBUG_LEVEL_INFO, "MAC Address: %s", WiFi.macAddress());
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
