@@ -47,32 +47,37 @@ void MyWiFi::notInitialized() {
     myDebug->println(DEBUG_LEVEL_ERROR, "WiFi not initialized");
 }
 
-void MyWiFi::connect() {    
-    myDebug->println(DEBUG_LEVEL_INFO, "WiFi disconnected, reconnecting...");
+void MyWiFi::connect() {
+    myDebug->println(DEBUG_LEVEL_INFO, "Connecting WiFi...");
 
     if (!initDone) {
         notInitialized();
-        return;        
+        return;
     }
 
     xSemaphoreTake(semaphoreData, portMAX_DELAY);
-    WiFi.disconnect();
-    WiFi.begin(savedSSID, savedPassword);
-    unsigned long startAttemptTime = millis();
 
-    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(false, true);
+    delay(100);
+
+    WiFi.begin(savedSSID, savedPassword);
+
+    unsigned long start = millis();
+
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
         myDebug->print(DEBUG_LEVEL_DEBUG, ".");
         delay(500);
     }
 
-    wifi_ap_record_t ap_info;
-    if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
-        myDebug->println(DEBUG_LEVEL_DEBUG, "WiFi connected");
-        WiFiChannel = ap_info.primary;      
-        myDebug->println(DEBUG_LEVEL_DEBUG, "WiFi channel: %d", WiFiChannel);
+    if (WiFi.status() == WL_CONNECTED) {
+        wifi_ap_record_t ap_info;
+        if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+            WiFiChannel = ap_info.primary;
+        }
+        myDebug->println(DEBUG_LEVEL_INFO, "WiFi connected OK");
     } else {
-        WiFiChannel = 0;
-        myDebug->println(DEBUG_LEVEL_DEBUG, "Not connected to any WiFi network.");    
+        myDebug->println(DEBUG_LEVEL_ERROR, "WiFi connect FAILED");
     }
     xSemaphoreGive(semaphoreData);
 }
