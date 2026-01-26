@@ -27,6 +27,20 @@ void MyWiFi::init(wifi_mode_t mode, char *ssid, char *password) {
 
     myDebug->println(DEBUG_LEVEL_DEBUG2, "SSID: '%s', password:'%s'", savedSSID, savedPassword);
 
+    WiFi.disconnect(true, true);
+    delay(300);
+
+    esp_wifi_stop();
+    delay(300);
+
+    esp_wifi_deinit();
+    delay(300);
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&cfg);
+
+    esp_wifi_start();
+    delay(300);
     WiFi.mode(mode);
     myDebug->println(DEBUG_LEVEL_INFO, "MAC Address: %s", WiFi.macAddress());
     initDone = true;
