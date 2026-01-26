@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include "esp_wifi.h"
 #include <esp_now.h>
-
+#include "nvs_flash.h"
 #include "MyDebug.h"
 #include "MyWiFi.h"
 
