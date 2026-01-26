@@ -38,6 +38,7 @@ public:
     MyWiFi();
     // functions
     void init(wifi_mode_t mode, char *ssid, char *password);
+    void clearNVS();
     void stop();
     bool initESPNow(int channel, bool encrypted, OnDataSentCallback onSent, OnDataRecvCallback onRecv);
     void addEspNowPeer(uint8_t address[6]);    

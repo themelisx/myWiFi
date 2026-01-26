@@ -17,7 +17,7 @@ MyWiFi::MyWiFi() {
 }
 
 void MyWiFi::init(wifi_mode_t mode, char *ssid, char *password) {
-    myDebug->println(DEBUG_LEVEL_DEBUG, "Initializing WiFi");  
+    myDebug->println(DEBUG_LEVEL_DEBUG, "Initializing WiFi");
     
     savedSSID = (char*)malloc(strlen(ssid) + 1);
     strcpy(savedSSID, ssid);
@@ -44,6 +44,20 @@ void MyWiFi::init(wifi_mode_t mode, char *ssid, char *password) {
     WiFi.mode(mode);
     myDebug->println(DEBUG_LEVEL_INFO, "MAC Address: %s", WiFi.macAddress());
     initDone = true;
+}
+
+void MyWiFi::clearNVS() {
+    // In case you want to clean the NVS (Non-Volatile Storage)
+    //  NVS is the permanent memory that ESP32 saves:
+    //  WiFi calibration data
+    //  RF / PHY settings
+    //  Saved SSIDs & passwords
+    //  ESP-NOW state
+    //  System flags
+    //  Data from WiFi driver
+    
+    nvs_flash_erase();
+    nvs_flash_init();
 }
 
 void MyWiFi::stop() {
